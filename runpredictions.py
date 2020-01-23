@@ -67,26 +67,31 @@ def standard_label_preprocessing(y):
 def make_predictions(x_dataset, y_dataset):
     selected_model = st.sidebar.selectbox("Select the model", POSSIBLE_MODEL)
     test_size = st.sidebar.slider('Test set size', 0.01, 0.99, 0.2)
-    model_parameters = display_hyperparameter(selected_model)
+    model_parameters = display_hyperparameters(selected_model)
     X_train, X_test, y_train, y_test = train_test_split(x_dataset, y_dataset, test_size=test_size, random_state=42)
     st.write("Running **%s** with a test set size of **%d%%**." % (selected_model, int(test_size*100)))
     st.write("There are **%d** instances in the training set and **%d** instances in the test set." % (len(X_train), len(X_test)))
     if st.button("Run predictions"):
         if selected_model == "XGBoost":
             model = XGBClassifier(**model_parameters)
-            st.write(model_parameters)
+            st.write("Dictionary of hyperparameters: ", model_parameters)
             model_train_predict(model, X_train, y_train, X_test, y_test)
         elif selected_model == "Random Forest":
             model = RandomForestClassifier(**model_parameters)
-            st.write("Hyperparameters: ", model_parameters)
+            st.write("Dictionary of hyperparameters:", model_parameters)
             model_train_predict(model, X_train, y_train, X_test, y_test)
         elif selected_model == "Support Vector Machine":
             model = SVC(**model_parameters)
-            st.write(model_parameters)
+            st.write("Dictionary of hyperparameters: ", model_parameters)
             model_train_predict(model, X_train, y_train, X_test, y_test)
 
 
 def model_train_predict(model, x_train, y_train, x_test, y_test):
+    # If there is only one class in the training set, return
+    if y_train.nunique().values[0] == 1:
+        st.error(":warning: There is only **one** class in the training set. " +
+                 "Please increase the size of the training set or adjust the dataset accordingly.")
+        return
     with st.spinner('Training the model..'):
         model.fit(x_train, y_train)
     with st.spinner('Predicting..'):
@@ -96,14 +101,14 @@ def model_train_predict(model, x_train, y_train, x_test, y_test):
         st.write("Accuracy: %.2f%%" % (accuracy * 100.0))
 
 
-def display_hyperparameter(selected_model):
+def display_hyperparameters(selected_model):
     hyperparameters = {}
     if selected_model == "XGBoost":
-        hyperparameters.clear()
+        pass
     elif selected_model == "Random Forest":
-        hyperparameters.clear()
+        pass
         hyperparameters['n_estimators'] = st.sidebar.slider("Num. estimators", 1, 200, 100)
         hyperparameters['min_samples_split'] = st.sidebar.slider("Min. samples  split", 1, 20, 2)
     elif selected_model == "Support Vector Machine":
-        hyperparameters.clear()
+        pass
     return hyperparameters
