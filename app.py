@@ -17,7 +17,7 @@ def main():
         if selected_option == "Data exploration":
             dataexploration.render_data_explorations(dataframe)
         elif selected_option == "Run predictions":
-            runpredictions.make_predictions([], [])
+            runpredictions.render_run_predictions(dataframe)
 
 
 if __name__ == "__main__":

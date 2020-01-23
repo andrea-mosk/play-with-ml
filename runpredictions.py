@@ -9,6 +9,9 @@ from sklearn.compose import ColumnTransformer
 import dataframefunctions
 import pandas as pd
 import streamlit as st
+import time
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.svm import SVC
 
 POSSIBLE_MODEL = ["XGBoost", "Random Forest", "Support Vector Machine"]
 
@@ -19,6 +22,7 @@ def render_run_predictions(dataframe):
     x_dataset = pd.DataFrame(x_prepared, columns=dataframe.columns[:-1], index=dataframe.index)
     y_dataset = pd.DataFrame(y_prepared, columns=[label_name], index=dataframe.index)
     make_predictions(x_dataset, y_dataset)
+
 
 
 def preprocess_dataset(dataframe, label_name):
@@ -62,28 +66,44 @@ def standard_label_preprocessing(y):
 
 def make_predictions(x_dataset, y_dataset):
     selected_model = st.sidebar.selectbox("Select the model", POSSIBLE_MODEL)
-    test_size = st.sidebar.slider('Test set size', 0.0, 1.0, 0.2)
-    st.write("Running %s with a test set size of %d%%" % (selected_model, int(test_size*100)))
+    test_size = st.sidebar.slider('Test set size', 0.01, 0.99, 0.2)
+    model_parameters = display_hyperparameter(selected_model)
+    X_train, X_test, y_train, y_test = train_test_split(x_dataset, y_dataset, test_size=test_size, random_state=42)
+    st.write("Running **%s** with a test set size of **%d%%**." % (selected_model, int(test_size*100)))
+    st.write("There are **%d** instances in the training set and **%d** instances in the test set." % (len(X_train), len(X_test)))
     if st.button("Run predictions"):
         if selected_model == "XGBoost":
-            run_xgboost_predictions(test_size, x_dataset, y_dataset)
+            model = XGBClassifier(**model_parameters)
+            st.write(model_parameters)
+            model_train_predict(model, X_train, y_train, X_test, y_test)
         elif selected_model == "Random Forest":
-            run_rfc_predictions(test_size, x_dataset, y_dataset)
+            model = RandomForestClassifier(**model_parameters)
+            st.write("Hyperparameters: ", model_parameters)
+            model_train_predict(model, X_train, y_train, X_test, y_test)
         elif selected_model == "Support Vector Machine":
-            run_svm_predictions(test_size, x_dataset, y_dataset)
+            model = SVC(**model_parameters)
+            st.write(model_parameters)
+            model_train_predict(model, X_train, y_train, X_test, y_test)
 
 
-# TODO
-def run_xgboost_predictions(test_size, x_dataset, y_dataset):
-    st.write("xgboost")
+def model_train_predict(model, x_train, y_train, x_test, y_test):
+    with st.spinner('Training the model..'):
+        model.fit(x_train, y_train)
+    with st.spinner('Predicting..'):
+        y_pred = model.predict(x_test)
+        predictions = [round(value) for value in y_pred]
+        accuracy = accuracy_score(y_test, predictions)
+        st.write("Accuracy: %.2f%%" % (accuracy * 100.0))
 
 
-
-# TODO
-def run_rfc_predictions(test_size, x_dataset, y_dataset):
-    st.write("RFC")
-
-
-# TODO
-def run_svm_predictions(test_size, x_dataset, y_dataset):
-    st.write("SVM")
+def display_hyperparameter(selected_model):
+    hyperparameters = {}
+    if selected_model == "XGBoost":
+        hyperparameters.clear()
+    elif selected_model == "Random Forest":
+        hyperparameters.clear()
+        hyperparameters['n_estimators'] = st.sidebar.slider("Num. estimators", 1, 200, 100)
+        hyperparameters['min_samples_split'] = st.sidebar.slider("Min. samples  split", 1, 20, 2)
+    elif selected_model == "Support Vector Machine":
+        hyperparameters.clear()
+    return hyperparameters
