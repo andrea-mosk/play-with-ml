@@ -10,9 +10,14 @@ SIDEBAR_WHAT_TODO = ["Data exploration", "Run predictions"]
 
 
 def main():
-    uploaded_file = st.sidebar.file_uploader("Upload your CSV dataset and see all the statistics!", type='csv')
+    uploaded_file = st.sidebar.file_uploader("Please upload your dataset:", type='csv')
+    is_loaded_dataset = st.sidebar.warning("Dataset not uploaded")
     if uploaded_file is not None:
-        dataframe = dataframefunctions.get_dataframe(uploaded_file)
+        is_loaded_dataset.success("Dataset uploaded successfully!")
+        try:
+            dataframe = dataframefunctions.get_dataframe(uploaded_file)
+        except:
+            is_loaded_dataset.error("The imported dataset can't be read from pandas, please try again.")
         selected_option = st.sidebar.selectbox("What to do?", SIDEBAR_WHAT_TODO)
         if selected_option == "Data exploration":
             dataexploration.render_data_explorations(dataframe)

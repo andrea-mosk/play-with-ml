@@ -33,9 +33,9 @@ def render_missing_data(dataframe):
 
 
 def render_first_look(dataframe):
-    number_of_rows = st.sidebar.slider('Number of rows', 1, 150, 10)
+    number_of_rows = st.sidebar.slider('Number of rows', 1, 50, 10)
     st.markdown("### Exploring the dataset :mag: ###")
-    st.dataframe(dataframe.head(number_of_rows))
+    st.dataframe(dataframe.head(number_of_rows).style.applymap(dataframefunctions.color_null_red))
     display_firstlook_comments(dataframe)
 
 

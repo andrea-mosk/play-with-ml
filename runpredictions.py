@@ -14,6 +14,7 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.svm import SVC
 
 POSSIBLE_MODEL = ["XGBoost", "Random Forest", "Support Vector Machine"]
+KERNEL_OPTIONS = ['Rbf', 'Linear', 'Poly', 'Sigmoid']
 
 
 def render_run_predictions(dataframe):
@@ -72,17 +73,15 @@ def make_predictions(x_dataset, y_dataset):
     st.write("Running **%s** with a test set size of **%d%%**." % (selected_model, int(test_size*100)))
     st.write("There are **%d** instances in the training set and **%d** instances in the test set." % (len(X_train), len(X_test)))
     if st.button("Run predictions"):
+        st.write("Hyperparameters used: ", model_parameters)
         if selected_model == "XGBoost":
             model = XGBClassifier(**model_parameters)
-            st.write("Dictionary of hyperparameters: ", model_parameters)
             model_train_predict(model, X_train, y_train, X_test, y_test)
         elif selected_model == "Random Forest":
             model = RandomForestClassifier(**model_parameters)
-            st.write("Dictionary of hyperparameters:", model_parameters)
             model_train_predict(model, X_train, y_train, X_test, y_test)
         elif selected_model == "Support Vector Machine":
             model = SVC(**model_parameters)
-            st.write("Dictionary of hyperparameters: ", model_parameters)
             model_train_predict(model, X_train, y_train, X_test, y_test)
 
 
@@ -108,7 +107,13 @@ def display_hyperparameters(selected_model):
     elif selected_model == "Random Forest":
         pass
         hyperparameters['n_estimators'] = st.sidebar.slider("Num. estimators", 1, 200, 100)
-        hyperparameters['min_samples_split'] = st.sidebar.slider("Min. samples  split", 1, 20, 2)
+        hyperparameters['min_samples_split'] = st.sidebar.slider("Min. samples  split", 2, 20, 2)
+        hyperparameters['criterion'] = st.sidebar.selectbox("Select the criteria", ['Gini', 'Entropy']).lower()
+        hyperparameters['min_samples_leaf'] = st.sidebar.slider("Min. samples  leaf", 1, 50, 1)
     elif selected_model == "Support Vector Machine":
+        hyperparameters['C'] = st.sidebar.number_input('Regularization', min_value=1.0, max_value=50.0)
+        hyperparameters['kernel'] = st.sidebar.selectbox("Select the kernel", KERNEL_OPTIONS).lower()
+        hyperparameters['gamma'] = st.sidebar.radio("Select the kernel coefficient", ['Scale', 'Auto']).lower()
+
         pass
     return hyperparameters

@@ -62,3 +62,8 @@ def get_numeric_columns(df):
 
 def is_categorical(column):
     return column.dtype.name == 'object'
+
+
+def color_null_red(val):
+    return 'color: red' if pd.isnull(val) else 'color: black'
+
