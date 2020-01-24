@@ -67,6 +67,7 @@ def standard_label_preprocessing(y):
 
 def make_predictions(x_dataset, y_dataset):
     selected_model = st.sidebar.selectbox("Select the model", POSSIBLE_MODEL)
+    st.sidebar.subheader("Experiment parameters:")
     test_size = st.sidebar.slider('Test set size', 0.01, 0.99, 0.2)
     model_parameters = display_hyperparameters(selected_model)
     X_train, X_test, y_train, y_test = train_test_split(x_dataset, y_dataset, test_size=test_size, random_state=42)
@@ -96,24 +97,28 @@ def model_train_predict(model, x_train, y_train, x_test, y_test):
     with st.spinner('Predicting..'):
         y_pred = model.predict(x_test)
         predictions = [round(value) for value in y_pred]
-        accuracy = accuracy_score(y_test, predictions)
-        st.write("Accuracy: %.2f%%" % (accuracy * 100.0))
+        st.write("Train accuracy: %.2f%%" % (accuracy_score(y_train, model.predict(x_train)) * 100.0))
+        st.write("Test accuracy: %.2f%%" % (accuracy_score(y_test, predictions) * 100.0))
 
 
 def display_hyperparameters(selected_model):
     hyperparameters = {}
+    st.sidebar.subheader("Model parameters:")
     if selected_model == "XGBoost":
-        pass
+        hyperparameters['max_depth'] = st.sidebar.slider("Maximum depth", 1, 20, 3)
+        hyperparameters['learning_rate'] = st.sidebar.number_input('Learning rate',
+                                                                   min_value=0.0001,
+                                                                   max_value=10.0,
+                                                                   value=0.01)
+        hyperparameters['n_estimators'] = st.sidebar.slider("Num. estimators", 1, 500, 100)
     elif selected_model == "Random Forest":
-        pass
         hyperparameters['n_estimators'] = st.sidebar.slider("Num. estimators", 1, 200, 100)
         hyperparameters['min_samples_split'] = st.sidebar.slider("Min. samples  split", 2, 20, 2)
         hyperparameters['criterion'] = st.sidebar.selectbox("Select the criteria", ['Gini', 'Entropy']).lower()
         hyperparameters['min_samples_leaf'] = st.sidebar.slider("Min. samples  leaf", 1, 50, 1)
     elif selected_model == "Support Vector Machine":
-        hyperparameters['C'] = st.sidebar.number_input('Regularization', min_value=1.0, max_value=50.0)
+        hyperparameters['C'] = st.sidebar.number_input('Regularization', min_value=1.0, max_value=50.0, value=1.0)
         hyperparameters['kernel'] = st.sidebar.selectbox("Select the kernel", KERNEL_OPTIONS).lower()
         hyperparameters['gamma'] = st.sidebar.radio("Select the kernel coefficient", ['Scale', 'Auto']).lower()
 
-        pass
     return hyperparameters
