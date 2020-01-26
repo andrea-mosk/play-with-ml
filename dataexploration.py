@@ -1,3 +1,5 @@
+import time
+
 import streamlit as st
 import pandas as pd
 import dataframefunctions
@@ -8,7 +10,7 @@ import exploreattributes
 
 
 
-POSSIBLE_DATAEXP_ACTIONS = ["Missing data", "Explore attributes", "Dataset first look", "Interactive data cleaning"]
+POSSIBLE_DATAEXP_ACTIONS = ["Dataset first look", "Missing data", "Explore attributes", "Interactive data cleaning"]
 
 
 def render_data_explorations(dataframe):
@@ -45,9 +47,12 @@ def display_firstlook_comments(dataframe):
     numerical_columns = dataframefunctions.get_numeric_columns(dataframe)
     random_cat_column = categorical_columns[0] if len(categorical_columns) > 0 else ""
     random_num_column = numerical_columns[0] if len(numerical_columns) > 0 else ""
+    total_missing_values = dataframe.isnull().sum().sum()
     st.write("* The dataset has **%d** instances and **%d** features. Hence, the _instances-features ratio_ is ~**%d**."
              % (num_instances, num_features, int(num_instances/num_features)))
     st.write("* The dataset has **%d** categorical columns (e.g. %s) and **%d** numerical columns (e.g. %s)."
              % (len(categorical_columns), random_cat_column, len(numerical_columns), random_num_column))
+    st.write("* Total number of missing values: **%d** (~**%.2f**%%)."
+             % (total_missing_values, 100*total_missing_values/(num_instances*num_features)))
 
 
