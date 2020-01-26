@@ -3,29 +3,18 @@ import dataframefunctions
 import plotly.express as px
 import seaborn as sns
 
-POSSIBLE_ATTRIBUTES_EXPLORATIONS = ["Linear correlation", "Scatterplot", "Boxplot"]
+POSSIBLE_ATTRIBUTES_EXPLORATIONS = ["Scatterplot", "Boxplot"]
 
 
 def explore_attributes(dataframe):
     attrexp_action = st.sidebar.selectbox("Select the method", POSSIBLE_ATTRIBUTES_EXPLORATIONS)
-    if attrexp_action == "Linear correlation":
-        render_linear_correlation(dataframe)
 
-    elif attrexp_action == "Scatterplot":
+    if attrexp_action == "Scatterplot":
         render_scatterplot(dataframe)
 
     elif attrexp_action == "Boxplot":
         render_boxplot(dataframe)
 
-
-def render_linear_correlation(dataframe):
-    label_name = list(dataframe.columns)[-1]
-    if dataframefunctions.is_categorical(dataframe[label_name]):
-        display_correlation_error()
-        return
-    positive_corr, negative_corr = dataframefunctions.get_linear_correlations(dataframe, label_name)
-    st.write('Positively correlated features', positive_corr)
-    st.write('Negatively correlated features', negative_corr)
 
 
 def render_scatterplot(dataframe):
@@ -63,7 +52,3 @@ def render_boxplot(dataframe):
     st.plotly_chart(fig)
 
 
-def display_correlation_error():
-    st.write(":no_entry::no_entry::no_entry:")
-    st.write("It's **not** possible to determine a linear correlation with a categorical label.")
-    st.write("For more info, please check [this link.](https://stackoverflow.com/questions/47894387/how-to-correlate-an-ordinal-categorical-column-in-pandas)")
