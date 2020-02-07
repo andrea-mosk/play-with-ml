@@ -72,3 +72,5 @@ def display_correlation_error():
     st.write("It's **not** possible to determine a linear correlation with a categorical label.")
     st.write("For more info, please check [this link.](https://stackoverflow.com/questions/47894387/how-to-correlate-an-ordinal-categorical-column-in-pandas)")
 
+def wrangl(dataframe):
+    pass
