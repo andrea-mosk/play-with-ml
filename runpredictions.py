@@ -1,26 +1,20 @@
-import xgboost as xgb
 from sklearn.model_selection import train_test_split
-from sklearn.preprocessing import LabelEncoder, StandardScaler, OneHotEncoder
 from xgboost import XGBClassifier, XGBRegressor
 from sklearn.metrics import accuracy_score, mean_squared_error, f1_score, precision_score, recall_score
 from sklearn.neighbors import KNeighborsClassifier
-from sklearn.pipeline import Pipeline
-from sklearn.impute import SimpleImputer
-from sklearn.compose import ColumnTransformer
-import dataframefunctions
-import pandas as pd
 import streamlit as st
-import time
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.svm import SVC
 import numpy as np
-from math import log
 import preprocessing
 
 
-POSSIBLE_MODEL = ["XGBoost (classifier)", "XGBoost (regressor)", "Random Forest", "Support Vector Machine", "K-nearest neighbors"]
+POSSIBLE_MODEL = ["XGBoost (classifier)",
+                  "XGBoost (regressor)",
+                  "Random Forest",
+                  "Support Vector Machine",
+                  "K-nearest neighbors"]
 KERNEL_OPTIONS = ['Rbf', 'Linear', 'Poly', 'Sigmoid']
-INDEX_COLUMNS = ["ID", "id", "Id", "iD", "INDEX", "Index", "index"]
 EVALUATION_METRICS = ["Accuracy", "RMSE", "F1", "Precision", "Recall", "MSE"]
 WEIGHT_FUNCTION_OPTION = ["Uniform", "Distance"]
 ALGORITHM = ["Auto", "Ball tree", "Kd tree", "Brute"]
@@ -30,8 +24,7 @@ def load_page(dataframe):
     st.sidebar.subheader("Experiment parameters:")
     test_size = st.sidebar.slider('Test set size', 0.01, 0.99, 0.2)
     evaluation_metrics = st.sidebar.multiselect("Select the evaluation metrics",
-                                                EVALUATION_METRICS,
-                                                default=["Accuracy"])
+                                                EVALUATION_METRICS)
     selected_model = st.sidebar.selectbox("Select the model", POSSIBLE_MODEL)
     model_parameters = display_hyperparameters(selected_model)
     display_experiment_stats(dataframe, test_size, selected_model)
@@ -43,21 +36,30 @@ def load_page(dataframe):
 
 
 def run_predictions(dataframe, test_size, selected_model, parameters, metrics):
+    """Puts together preprocessing, training and testing."""
+
     st.markdown(":chart_with_upwards_trend: Hyperparameters used: ")
     st.write(parameters)
+
+    # Preprocessing data
     with st.spinner("Preprocessing data.."):
-        # x, y = preprocess_dataset(dataframe)
         x, y = preprocessing.preprocess(dataframe)
         X_train, X_test, y_train, y_test = train_test_split(x, y, test_size=test_size, random_state=42)
+
+    # Training the model
     with st.spinner("Training model.."):
         model = get_trained_model(X_train, y_train, selected_model, parameters)
         if model is None:
             return
+
+    # Testing the model
     with st.spinner("Testing model.."):
         test_model(model, X_train, y_train, X_test, y_test, metrics)
 
 
 def display_experiment_stats(dataframe, test_size, selected_model):
+    """Displays the experiment input, e.g. test set size"""
+
     num_instances = dataframe.shape[0]
     training_instances = round(num_instances * (1 - test_size), 0)
     test_instances = round(num_instances * test_size, 0)
@@ -66,18 +68,9 @@ def display_experiment_stats(dataframe, test_size, selected_model):
              (training_instances, test_instances))
 
 
-def drop_label_and_index(dataframe):
-    columns = list(dataframe.columns)
-    label_name = columns[-1]
-    x = dataframe.drop(label_name, axis=1)
-    set_columns = set(columns)
-    for index_column in INDEX_COLUMNS:
-        if index_column in set_columns:
-            x.drop(index_column, axis=1, inplace=True)
-    return x, label_name
-
-
 def display_hyperparameters(selected_model):
+    """Display the possible hyperparameters of the model chosen by the user."""
+
     hyperparameters = {}
     st.sidebar.subheader("Model parameters:")
 
@@ -116,40 +109,33 @@ def display_hyperparameters(selected_model):
 
 
 def get_trained_model(x, y, model, parameters):
+    """Creates and trains a new model based on the user's input."""
+
     if model == "XGBoost (classifier)":
         model = XGBClassifier(**parameters)
-        return train_model(x, y, model)
+
     elif model == "Random Forest":
         model = RandomForestClassifier(**parameters)
-        return train_model(x, y, model)
+
     elif model == "Support Vector Machine":
         model = SVC(**parameters)
-        return train_model(x, y, model)
+
     elif model == "K-nearest neighbors":
         model = KNeighborsClassifier(**parameters)
-        return train_model(x, y, model)
+
     elif model == "XGBoost (regressor)":
         model = XGBRegressor(**parameters)
-        return train_model(x, y, model)
 
-
-def train_model(x, y, model):
-    # if y.nunique().values[0] == 1:
-    #     st.error(":warning: There is only **one** class in the training set. " +
-    #              "Please increase the size of the training set or adjust the dataset accordingly.")
-    #     return
-    trained_model = model.fit(x, y)
-    return trained_model
+    return model.fit(x, y)
 
 
 def test_model(model, X_train, y_train, X_test, y_test, metrics):
+    """Tests the model predictions based on the chosen metrics."""
 
     y_train_pred = model.predict(X_train)
     y_test_pred = model.predict(X_test)
 
     if "RMSE" in metrics:
-        # train_mse = mean_squared_error(get_log(y_train), get_log(model.predict(X_train)))
-        # test_mse = mean_squared_error(get_log(y_test), get_log(model.predict(X_test)))
         train_mse = mean_squared_error(y_train, y_train_pred)
         test_mse = mean_squared_error(y_test, y_test_pred)
         st.write("Train rmse: %.4f" % (np.sqrt(train_mse)))
@@ -174,8 +160,3 @@ def test_model(model, X_train, y_train, X_test, y_test, metrics):
     if "MSE" in metrics:
         st.write("Train mse: %.4f" % mean_squared_error(y_train, y_train_pred))
         st.write("Test mse: %.4f" % mean_squared_error(y_test, y_test_pred))
-
-
-
-def get_log(list):
-    return [log(elem, 10) for elem in list]
