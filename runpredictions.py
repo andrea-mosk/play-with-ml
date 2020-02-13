@@ -75,12 +75,12 @@ def display_hyperparameters(selected_model):
     st.sidebar.subheader("Model parameters:")
 
     if selected_model == "XGBoost (classifier)":
-        hyperparameters['max_depth'] = st.sidebar.slider("Maximum depth", 1, 20, 3)
         hyperparameters['learning_rate'] = st.sidebar.number_input('Learning rate',
                                                                    min_value=0.0001,
                                                                    max_value=10.0,
                                                                    value=0.1)
         hyperparameters['n_estimators'] = st.sidebar.slider("Num. estimators", 1, 500, 100)
+        hyperparameters['max_depth'] = st.sidebar.slider("Maximum depth", 1, 20, 3)
 
     if selected_model == "XGBoost (regressor)":
         hyperparameters['learning_rate'] = st.sidebar.number_input('Learning rate',
@@ -88,6 +88,7 @@ def display_hyperparameters(selected_model):
                                                                    max_value=10.0,
                                                                    value=0.1)
         hyperparameters['n_estimators'] = st.sidebar.slider("Num. estimators", 1, 500, 100)
+        hyperparameters['max_depth'] = st.sidebar.slider("Maximum depth", 1, 100, 6)
 
     elif selected_model == "Random Forest":
         hyperparameters['n_estimators'] = st.sidebar.slider("Num. estimators", 1, 200, 100)

@@ -1,19 +1,35 @@
 import streamlit as st
 import dataframefunctions
 import plotly.express as px
+import seaborn as sns
+import matplotlib.pyplot as plt
+import numpy as np
 
 
-POSSIBLE_ATTRIBUTES_EXPLORATIONS = ["Scatterplot", "Boxplot"]
+POSSIBLE_ATTRIBUTES_EXPLORATIONS = ["Scatter plot",
+                                    "Box plot",
+                                    "Correlation matrix",
+                                    "Count plot",
+                                    "Distribution plot"]
 
 
 def load_page(dataframe):
     attrexp_action = st.sidebar.selectbox("Select the method", POSSIBLE_ATTRIBUTES_EXPLORATIONS)
 
-    if attrexp_action == "Scatterplot":
+    if attrexp_action == "Scatter plot":
         render_scatterplot(dataframe)
 
-    elif attrexp_action == "Boxplot":
+    elif attrexp_action == "Box plot":
         render_boxplot(dataframe)
+
+    elif attrexp_action == "Correlation matrix":
+        render_corr_matrix(dataframe)
+
+    elif attrexp_action == "Count plot":
+        render_count_plot(dataframe)
+
+    elif attrexp_action == "Distribution plot":
+        render_distplot(dataframe)
 
 
 def render_scatterplot(dataframe):
@@ -29,13 +45,15 @@ def render_scatterplot(dataframe):
     if sized:
         size_attribute = st.selectbox('Which attribute?', column_names)
 
-    fig = px.scatter(dataframe,
-                     x=first_attribute,
-                     y=second_attribute,
-                     color=label_name if colored else None,
-                     opacity=alpha_value,
-                     size=None if not sized else size_attribute)
-    st.plotly_chart(fig)
+    with st.spinner("Plotting data.."):
+        fig = px.scatter(dataframe,
+                         x=first_attribute,
+                         y=second_attribute,
+                         color=label_name if colored else None,
+                         opacity=alpha_value,
+                         size=None if not sized else size_attribute)
+
+        st.plotly_chart(fig)
 
 
 def render_boxplot(dataframe):
@@ -50,10 +68,45 @@ def render_boxplot(dataframe):
                                 index=len(numeric_columns) - 1)
     show_points = st.sidebar.checkbox("Show points", value=False)
 
-    fig = px.box(dataframe,
-                 x=boxplot_att1,
-                 y=boxplot_att2,
-                 points='all' if show_points else 'outliers')
-    st.plotly_chart(fig)
+    with st.spinner("Plotting data.."):
+        fig = px.box(dataframe,
+                     x=boxplot_att1,
+                     y=boxplot_att2,
+                     points='all' if show_points else 'outliers')
+
+        st.plotly_chart(fig)
+
+
+def render_corr_matrix(dataframe):
+    """Renders a correlation matrix based on the user's input."""
+
+    if len(dataframefunctions.get_numeric_columns(dataframe)) > 30:
+        st.warning("Warning: since the dataset has more than 30 features, the figure might be inaccurate.")
+
+    corr = dataframe.corr()
+
+    # Masking the upper triangle
+    mask = np.triu(np.ones_like(corr, dtype=np.bool))
+
+    f, ax = plt.subplots(figsize=(15, 12))
+    cmap = sns.diverging_palette(10, 140, n=9, s=90, as_cmap=True)
+    sns.heatmap(corr, mask=mask, cmap=cmap, center=0, square=True, linewidths=.5, cbar_kws={"shrink": .5})
+
+    with st.spinner("Plotting data.."):
+        st.pyplot()
+
+
+def render_count_plot(dataframe):
+    feature = st.selectbox('Which feature?', list(dataframe.columns))
+    with st.spinner("Plotting data.."):
+        sns.countplot(x=feature, data=dataframe)
+        st.pyplot()
+
+
+def render_distplot(dataframe):
+    feature = st.selectbox('Which feature?', dataframefunctions.get_numeric_columns(dataframe))
+    with st.spinner("Plotting distribution.."):
+        sns.distplot(dataframe[feature], color='g')
+        st.pyplot()
 
 

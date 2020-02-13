@@ -2,7 +2,6 @@ import pandas as pd
 import streamlit as st
 
 
-@st.cache
 def get_dataframe(dataset_file):
     """If the input dataset is not none, returns the equivalent Pandas Dataframe."""
 
