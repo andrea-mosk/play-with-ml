@@ -4,6 +4,7 @@ import plotly.express as px
 import seaborn as sns
 import matplotlib.pyplot as plt
 import numpy as np
+import plotly.figure_factory as ff
 
 
 POSSIBLE_ATTRIBUTES_EXPLORATIONS = ["Scatter plot",
@@ -97,6 +98,8 @@ def render_corr_matrix(dataframe):
 
 
 def render_count_plot(dataframe):
+    """Renders a count plot based on the user's input."""
+
     feature = st.selectbox('Which feature?', list(dataframe.columns))
     with st.spinner("Plotting data.."):
         sns.countplot(x=feature, data=dataframe)
@@ -104,6 +107,8 @@ def render_count_plot(dataframe):
 
 
 def render_distplot(dataframe):
+    """Renders a distribution plot based on the user's input."""
+
     feature = st.selectbox('Which feature?', dataframefunctions.get_numeric_columns(dataframe))
     with st.spinner("Plotting distribution.."):
         sns.distplot(dataframe[feature], color='g')

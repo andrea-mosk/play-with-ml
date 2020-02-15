@@ -36,7 +36,10 @@ def render_first_look(dataframe):
 
     number_of_rows = st.sidebar.slider('Number of rows', 1, 150, 10)
     st.markdown("## **Exploring the dataset :mag:** ##")
-    st.dataframe(dataframe.head(number_of_rows).style.applymap(dataframefunctions.color_null_red))
+    if st.sidebar.checkbox("Color NaN values in red", value=True):
+        st.dataframe(dataframe.head(number_of_rows).style.applymap(dataframefunctions.color_null_red))
+    else:
+        st.dataframe(dataframe.head(number_of_rows))
     render_firstlook_comments(dataframe)
 
 

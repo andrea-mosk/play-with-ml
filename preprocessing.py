@@ -1,13 +1,16 @@
 import pandas as pd
 from sklearn.preprocessing import StandardScaler, LabelEncoder
 import dataframefunctions
+import streamlit as st
+import time
 
 
 def useless(column):
     """Returns true if the column has only 1 value or if it is categorical and with more than 30 possible values."""
 
     return len(column[column.notnull()].unique()) <= 1 or \
-           (str(column.dtype) in ["object", "category"] and len(column.value_counts()) > 30)
+                column.is_monotonic or \
+                (str(column.dtype) in ["object", "category"] and len(column.value_counts()) > 30)
 
 
 def drop_high_zero_columns(df, percentage=0.95):
@@ -69,17 +72,51 @@ def encode_label(y):
 def preprocess(dataframe):
     """Puts together all the preprocessing functions and returns the preprocessed dataset."""
 
+    current_operation = st.empty()
+
+    current_operation.text("starting preprocessing")
+    progress_bar = st.progress(0)
+
     x = dataframe.drop(dataframe.columns[-1], axis=1)
     y = dataframe[dataframe.columns[-1]]
 
+    current_operation.text("Removing useless columns")
+    time.sleep(2)
     remove_useless_columns(x)
+    progress_bar.progress(15)
+
+    current_operation.text("Removing useless rows")
+    time.sleep(2)
     x, y = remove_null_rows(x, y)
+    progress_bar.progress(30)
+
+    current_operation.text("Replacing missing values")
     replace_missing_values(x)
+    progress_bar.progress(45)
+
+    current_operation.text("Scaling numerical values")
     scale(x)
+    progress_bar.progress(60)
+
+    current_operation.text("Getting dummies")
     x = pd.get_dummies(x)
+    progress_bar.progress(75)
+
+    current_operation.text("Dropping more useless columns")
     drop_high_zero_columns(x)
+    progress_bar.progress(90)
 
     if dataframefunctions.is_categorical(y):
+        current_operation.text("Transforming the label")
         y = encode_label(y)
+        progress_bar.progress(95)
+
+    current_operation.text("Preprocessing completed!")
+    progress_bar.progress(100)
+
+    # Removing the progress bar and the text displaying the current operation.. (st.empty() does not seem to work).
+    time.sleep(0.2)
+    current_operation.text("")
+    progress_bar.text("")
 
     return x, y

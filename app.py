@@ -5,7 +5,7 @@ import runpredictions
 from PIL import Image
 
 
-SIDEBAR_WHAT_TODO = ["Tutorial", "Data exploration", "Run predictions"]
+SIDEBAR_WHAT_TODO = ["Tutorial & info", "Data exploration", "Run predictions"]
 
 
 def main():
@@ -18,8 +18,9 @@ def main():
         dataframe = dataframefunctions.get_dataframe(uploaded_file)
         st.sidebar.markdown("## Navigation ##")
         selected_option = st.sidebar.radio("Go to:", SIDEBAR_WHAT_TODO)
-        if selected_option == "Tutorial":
+        if selected_option == "Tutorial & info":
             display_info(uploaded=True)
+            display_warnings()
         elif selected_option == "Data exploration":
             dataexploration.load_page(dataframe)
         elif selected_option == "Run predictions":
@@ -58,6 +59,12 @@ def display_info(uploaded):
     video_file = open('Videos/RunPredictions_recording.webm', 'rb')
     video_bytes = video_file.read()
     st.video(video_bytes)
+
+
+def display_warnings():
+    st.markdown("## Warning  :warning: ##")
+    st.markdown("To make the app work, there are some constraints on the dataset's structure:")
+    st.markdown("* The last attribute of the dataset must be the **label** and should not contain missing values.")
     
 
 if __name__ == "__main__":
