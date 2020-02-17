@@ -15,8 +15,10 @@ def load_page(dataframe):
 
         if dataexp_action == "Dataset first look":
             render_first_look(dataframe)
-            render_missing_data(dataframe)
-            render_linear_correlation(dataframe)
+            if st.sidebar.checkbox("Compute missing values"):
+                render_missing_data(dataframe)
+            if st.sidebar.checkbox("Compute linear correlation"):
+                render_linear_correlation(dataframe)
 
         elif dataexp_action == "Plots":
             plots.load_page(dataframe)
