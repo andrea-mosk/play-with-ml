@@ -18,16 +18,13 @@ def get_missing_values(dataframe):
 
 
 @st.cache
-def get_linear_correlations(df, label_name):
-    """returns two dataframes: the first contains positive correlations between features and label,
-    and the other contains negative correlations."""
+def get_linear_correlation(df, label_name, positive):
+    """Returns the correlation (positive or negative, based on the input) between the features and the label"""
 
     corr_matrix = df.corr()
-    positive_corr = get_signed_correlations(corr_matrix, label_name, positive=True)
-    negative_corr = get_signed_correlations(corr_matrix, label_name, positive=False)
-    positive_df = pd.DataFrame(positive_corr).rename(columns={label_name: 'Correlation'})
-    negative_df = pd.DataFrame(negative_corr).rename(columns={label_name: 'Correlation'})
-    return positive_df, negative_df
+    corr = get_signed_correlations(corr_matrix, label_name, positive=positive)
+    corr_df = pd.DataFrame(corr).rename(columns={label_name: 'Correlation'})
+    return corr_df
 
 
 def get_signed_correlations(corr_matrix, label_name, positive=True):

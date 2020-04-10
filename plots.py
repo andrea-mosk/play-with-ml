@@ -36,15 +36,16 @@ def load_page(dataframe):
 def render_scatterplot(dataframe):
     """Renders a scatterplot based on the user's input."""
 
-    column_names, label_name = dataframefunctions.get_columns_and_label(dataframe)
+    df_columns = list(dataframe.columns.values)
+    label_name = df_columns[len(df_columns) - 1]
 
-    first_attribute = st.selectbox('Which feature on x?', column_names)
-    second_attribute = st.selectbox('Which feature on y?', column_names, index=2)
+    first_attribute = st.selectbox('Which feature on x?', df_columns)
+    second_attribute = st.selectbox('Which feature on y?', df_columns, index=2)
     alpha_value = st.sidebar.slider('Alpha', 0.0, 1.0, 1.0)
     colored = st.sidebar.checkbox("Color based on Label", value=True)
     sized = st.checkbox("Size based on other attribute", value=False)
     if sized:
-        size_attribute = st.selectbox('Which attribute?', column_names)
+        size_attribute = st.selectbox('Which attribute?', dataframefunctions.get_numeric_columns(dataframe))
 
     with st.spinner("Plotting data.."):
         fig = px.scatter(dataframe,

@@ -71,14 +71,16 @@ def render_linear_correlation(dataframe):
     """If the label is not categorical, renders the linear correlation between the features and the label."""
 
     st.markdown("## **Linear correlation ** ##")
-    _, label_name = dataframefunctions.get_columns_and_label(dataframe)
+    df_columns = list(dataframe.columns.values)
+    label_name = df_columns[len(df_columns) - 1]
 
     # If the label is not categorical, show an error
     if dataframefunctions.is_categorical(dataframe[label_name]):
         display_correlation_error()
         return
 
-    positive_corr, negative_corr = dataframefunctions.get_linear_correlations(dataframe, label_name)
+    positive_corr = dataframefunctions.get_linear_correlation(dataframe, label_name, positive=True)
+    negative_corr = dataframefunctions.get_linear_correlation(dataframe, label_name, positive=False)
     st.write('Positively correlated features :chart_with_upwards_trend:', positive_corr)
     st.write('Negatively correlated features :chart_with_downwards_trend:', negative_corr)
 
