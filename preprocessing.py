@@ -56,7 +56,7 @@ def replace_missing_values(df):
     for col in df.columns:
         if df[col].isnull().any():
             col_dtype = str(df[col].dtype)
-            if (col_dtype == "object" or col_dtype == "category"):
+            if col_dtype == "object" or col_dtype == "category":
                 df[col].fillna(df[col].mode()[0], inplace=True)
             else:
                 df[col].fillna(df[col].mean(), inplace=True)
@@ -81,12 +81,12 @@ def preprocess(dataframe):
     y = dataframe[dataframe.columns[-1]]
 
     current_operation.text("Removing useless columns")
-    time.sleep(2)
+    # time.sleep(2)
     remove_useless_columns(x)
     progress_bar.progress(15)
 
     current_operation.text("Removing useless rows")
-    time.sleep(2)
+    # time.sleep(2)
     x, y = remove_null_rows(x, y)
     progress_bar.progress(30)
 

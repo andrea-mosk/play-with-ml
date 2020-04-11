@@ -67,15 +67,17 @@ def run_predictions(dataframe, test_size, selected_model, parameters, metrics, c
     x, y = preprocessing.preprocess(dataframe)
     st.success("Preprocessing completed!")
 
+    model = get_model(selected_model, parameters)
+
     if cross_val:
-        model = get_model(selected_model, parameters)
+        # model = get_model(selected_model, parameters)
         cross_validation(model, x, y, cv_k, metrics[0])
 
     else:
         # Training the model
         train_status = st.warning("Training model..")
         X_train, X_test, y_train, y_test = train_test_split(x, y, test_size=test_size)
-        model = get_model(selected_model, parameters)
+        # model = get_model(selected_model, parameters)
         model.fit(X_train, y_train)
         train_status.success("Training completed!")
 

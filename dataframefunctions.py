@@ -66,3 +66,4 @@ def color_null_red(val):
     """Coloring in red the NaN values."""
 
     return 'color: red' if pd.isnull(val) else 'color: black'
+

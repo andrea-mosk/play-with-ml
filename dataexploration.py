@@ -2,9 +2,10 @@ import streamlit as st
 import pandas as pd
 import dataframefunctions
 import plots
+import featuresanalysis
 
 
-POSSIBLE_DATAEXP_ACTIONS = ["Dataset first look", "Plots"]
+POSSIBLE_DATAEXP_ACTIONS = ["Dataset first look", "Plots", "Features"]
 
 
 def load_page(dataframe):
@@ -22,6 +23,9 @@ def load_page(dataframe):
 
         elif dataexp_action == "Plots":
             plots.load_page(dataframe)
+
+        elif dataexp_action == "Features":
+            featuresanalysis.load_page(dataframe)
 
 
 def render_missing_data(dataframe):
