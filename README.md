@@ -18,4 +18,4 @@
 
 The interface of the application has been done using [Streamlit](https://www.streamlit.io/). 
 
-<video src="video.mp4" width="320" height="200" controls preload></video>
+![Screenshot](Images\App_screenshot.png)
