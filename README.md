@@ -4,7 +4,7 @@
 
 * **Analyze a dataset**: This section allows you to take a first look at the dataset and discover the main statistics,
                          such as number of instances, missing data, etc. Moreover, you can make more advanced analysis,
-                         inspecting each feature in details, checking values such as skewness, mean, memory usage,
+                         such as inspecting each feature in details, checking values such as skewness, mean, memory usage,
                          correlation with label, etc.
                          
 * **Running a prediction model**: 
