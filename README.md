@@ -18,4 +18,4 @@
 
 The interface of the application has been done using [Streamlit](https://www.streamlit.io/). 
 
-![Screenshot](Images\App_screenshot.png)
+![](Images/App_screenshot.jpg)
