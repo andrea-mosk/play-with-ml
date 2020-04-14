@@ -19,3 +19,5 @@
 The interface of the application has been done using [Streamlit](https://www.streamlit.io/). 
 
 ![](Images/App_screenshot.jpg)
+
+Sample video on [Youtube](https://www.youtube.com/watch?v=9ZMroCF7_OU)
