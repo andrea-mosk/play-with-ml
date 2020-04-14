@@ -1,4 +1,6 @@
-PlayWithML allows you to quickly perform two important things:
+# PlayWithML 
+
+### This application allows you to quickly perform two important things:
 
 * **Analyze a dataset**: This section allows you to take a first look at the dataset and discover the main statistics,
                          such as number of instances, missing data, etc. Moreover, you can make more advanced analysis,
@@ -14,4 +16,4 @@ PlayWithML allows you to quickly perform two important things:
                          data, drop useless rows, scale features and so on.
                          
 
-The interface of this applications has been done using [Streamlit](https://www.streamlit.io/). 
+The interface of the application has been done using [Streamlit](https://www.streamlit.io/). 
